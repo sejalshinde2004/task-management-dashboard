@@ -1,0 +1,215 @@
+<div class="dashboard">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">PRODUCTIVITY OVERVIEW</p>
+      <h1>Task Dashboard</h1>
+      <p class="subtitle">Track your tasks and stay organized.</p>
+    </div>
+
+    <span class="live-badge">● Dashboard</span>
+  </header>
+
+  <!-- Error message -->
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Loading message -->
+  @if (isLoading) {
+    <div class="loading-message">
+      Loading your tasks...
+    </div>
+  }
+
+  <!-- Task Statistics -->
+  <section class="stats-grid">
+    <article class="stat-card total-card">
+      <p>Total Tasks</p>
+
+      <div class="stat-bottom">
+        <h2>{{ totalTasks }}</h2>
+        <span class="stat-icon">▦</span>
+      </div>
+
+      <small>All tasks in your workspace</small>
+    </article>
+
+    <article class="stat-card completed-card">
+      <p>Completed</p>
+
+      <div class="stat-bottom">
+        <h2>{{ completedTasks }}</h2>
+        <span class="stat-icon">✓</span>
+      </div>
+
+      <small>Tasks finished successfully</small>
+    </article>
+
+    <article class="stat-card pending-card">
+      <p>Pending</p>
+
+      <div class="stat-bottom">
+        <h2>{{ pendingTasks }}</h2>
+        <span class="stat-icon">◷</span>
+      </div>
+
+      <small>Tasks still to be completed</small>
+    </article>
+
+    <article class="stat-card priority-card">
+      <p>High Priority</p>
+
+      <div class="stat-bottom">
+        <h2>{{ highPriorityTasks }}</h2>
+        <span class="stat-icon">↑</span>
+      </div>
+
+      <small>Tasks requiring attention</small>
+    </article>
+  </section>
+
+  <!-- Task Overview -->
+  <section class="overview-card">
+    <div class="section-heading">
+      <div>
+        <h2>Task Overview</h2>
+        <p>Your productivity at a glance</p>
+      </div>
+
+      <span class="overview-icon">▤</span>
+    </div>
+
+    <!-- Task Completion Progress -->
+    <div class="progress-section">
+      <div class="progress-label">
+        <span>Task Completion</span>
+        <strong>{{ completionPercentage }}%</strong>
+      </div>
+
+      <div
+        class="progress-track"
+        role="progressbar"
+        [attr.aria-valuenow]="completionPercentage"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-label="Task completion progress"
+      >
+        <div
+          class="progress-fill"
+          [style.width.%]="completionPercentage"
+        ></div>
+      </div>
+
+      <p>
+        {{ completedTasks }} of {{ totalTasks }} tasks completed
+      </p>
+    </div>
+
+    <!-- Dashboard Connection Status -->
+    <div class="empty-state">
+      <div class="empty-icon">✓</div>
+
+      <h3>
+        @if (errorMessage) {
+          Dashboard connection issue
+        } @else if (isLoading) {
+          Loading dashboard...
+        } @else {
+          Your dashboard is connected!
+        }
+      </h3>
+
+      <p>
+        @if (errorMessage) {
+          Please check the backend server and try again.
+        } @else if (isLoading) {
+          Please wait while your task statistics load.
+        } @else {
+          Your task statistics are calculated from your task database.
+        }
+      </p>
+    </div>
+  </section>
+
+  <!-- Recent Tasks -->
+  <section class="recent-tasks-card">
+    <div class="section-heading">
+      <div>
+        <h2>Recent Tasks</h2>
+        <p>Tasks fetched from your database</p>
+      </div>
+    </div>
+
+    @if (tasks.length > 0) {
+      <div class="table-wrapper">
+        <table class="tasks-table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Category</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Due Date</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (task of tasks; track task.id) {
+              <tr>
+                <td class="task-title">
+                  {{ task.title }}
+                </td>
+
+                <td>
+                  {{ task.category || 'Uncategorized' }}
+                </td>
+
+                <td>
+                  <span
+                    class="priority-badge"
+                    [class.high]="task.priority?.toLowerCase() === 'high'"
+                    [class.medium]="task.priority?.toLowerCase() === 'medium'"
+                    [class.low]="task.priority?.toLowerCase() === 'low'"
+                  >
+                    {{ task.priority || 'Low' }}
+                  </span>
+                </td>
+
+                <td>
+                  <span
+                    class="status-badge"
+                    [class.completed]="task.status?.toLowerCase() === 'completed'"
+                    [class.pending]="task.status?.toLowerCase() === 'pending'"
+                  >
+                    {{ task.status || 'Unknown' }}
+                  </span>
+                </td>
+
+                <td>
+                  {{ task.due_date ? (task.due_date | date:'dd MMM yyyy') : '—' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (!isLoading) {
+      <div class="no-tasks">
+        @if (errorMessage) {
+          <p>Tasks could not be loaded.</p>
+        } @else {
+          <p>No tasks available yet.</p>
+        }
+      </div>
+    }
+  </section>
+
+  <footer>
+    Task Management &amp; Productivity Dashboard
+    <span>Built with Angular</span>
+  </footer>
+</div>
+
+<router-outlet />
